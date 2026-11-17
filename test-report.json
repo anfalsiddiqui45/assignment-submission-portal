@@ -1,0 +1,28 @@
+{
+  "repositoryName": "Devops Labmid",
+  "branch": "local",
+  "commitSha": "local",
+  "pipelineRunIdentifier": "local-run",
+  "executionTimestamp": "2026-11-17T19:27:54.414Z",
+  "tests": [
+    {
+      "name": "Complete details and a valid submission URL",
+      "result": "passed",
+      "failureMessage": null
+    },
+    {
+      "name": "Missing registration number",
+      "result": "passed",
+      "failureMessage": null
+    },
+    {
+      "name": "Invalid submission URL",
+      "result": "passed",
+      "failureMessage": null
+    }
+  ],
+  "total": 3,
+  "passed": 3,
+  "failed": 0,
+  "overallStatus": "passed"
+}

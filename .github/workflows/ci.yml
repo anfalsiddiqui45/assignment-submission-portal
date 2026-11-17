@@ -1,0 +1,74 @@
+name: Assignment Portal CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out revision
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Execute automated tests
+        id: tests
+        continue-on-error: true
+        run: npm test
+
+      - name: Send report to local receiver
+        if: always()
+        env:
+          REPORT_RECEIVER_URL: ${{ secrets.REPORT_RECEIVER_URL }}
+        run: |
+          if [ -n "$REPORT_RECEIVER_URL" ]; then
+            curl --fail --retry 3 --retry-delay 2 \
+              -H "Content-Type: application/json" \
+              --data-binary @test-report.json \
+              "$REPORT_RECEIVER_URL/report"
+          else
+            echo "REPORT_RECEIVER_URL is not configured; local receiver was not contacted."
+          fi
+
+      - name: Fail the test stage when tests fail
+        if: steps.tests.outcome != 'success'
+        run: |
+          echo "Tests failed; failing this revision."
+          exit 1
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out revision
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static frontend
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
