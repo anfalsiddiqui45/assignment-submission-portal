@@ -1,8 +1,7 @@
 function isValidHttpUrl(value) {
   try {
     const url = new URL(value);
-    // Demonstration defect: accepts every URL-like string as valid.
-    return Boolean(url);
+    return url.protocol === "http:" || url.protocol === "https:";
   } catch (_) {
     return false;
   }
