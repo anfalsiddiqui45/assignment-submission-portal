@@ -6,6 +6,7 @@
     "start": "node server.js",
     "test": "node tests/run-tests.js",
     "receiver": "node scripts/report-receiver.js",
-    "tunnel": "bash scripts/start-ngrok.sh"
+    "tunnel": "bash scripts/start-ngrok.sh",
+    "email-summary": "node scripts/create-email-summary.js"
   }
 }

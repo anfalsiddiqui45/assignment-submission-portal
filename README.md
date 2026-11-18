@@ -41,6 +41,19 @@ Keep `npm run tunnel` running during every demonstration push. The workflow send
 
 The receiver is available at `http://localhost:8787/report`, and `http://localhost:8787/health` confirms that it is running. GitHub-hosted runners require the Ngrok URL because their `localhost` is not your computer.
 
+## Email test report setup
+
+For Gmail or another SMTP provider, add these GitHub repository secrets:
+
+- `EMAIL_ADDRESS`: recipient email address
+- `SMTP_HOST`: provider host, for example `smtp.gmail.com`
+- `SMTP_PORT`: provider TLS port, usually `465`
+- `SMTP_USERNAME`: sender SMTP username
+- `SMTP_PASSWORD`: provider app password or SMTP password
+- `EMAIL_FROM`: optional sender address; defaults to `SMTP_USERNAME`
+
+After every test run, passing or failing, the workflow creates `email-summary.txt`, sends the summary, and attaches `test-report.json`. Email sending is skipped when the SMTP secrets are not configured.
+
 ## GitHub setup
 
 ```sh
