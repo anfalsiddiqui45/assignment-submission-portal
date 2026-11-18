@@ -18,26 +18,28 @@ npm test
 
 The tests execute three required cases and create `test-report.json`. A failed test exits with a non-zero status.
 
-## Start the local report receiver
+## Start the local report receiver with Ngrok
+
+First, install Ngrok and connect it to your Ngrok account:
 
 ```sh
-npm run receiver
+ngrok config add-authtoken YOUR_NGROK_TOKEN
 ```
 
-The receiver listens at `http://localhost:8787/report` and replaces `test-report.json` whenever GitHub sends a report.
-
-Keep the receiver running during pushes. To expose it to GitHub-hosted runners, start a tunnel such as ngrok:
+Then start the receiver and public HTTPS tunnel together:
 
 ```sh
-ngrok http 8787
+npm run tunnel
 ```
 
-In the GitHub repository, open **Settings → Secrets and variables → Actions → New repository secret** and add:
+Ngrok prints a public HTTPS forwarding URL, for example `https://abc123.ngrok-free.app`. In the GitHub repository, open **Settings → Secrets and variables → Actions → Repository secrets → New repository secret** and add:
 
 - Name: `REPORT_RECEIVER_URL`
-- Value: the tunnel base URL, for example `https://abc123.ngrok-free.app`
+- Value: the Ngrok HTTPS URL without `/report`
 
-The workflow sends `test-report.json` to `<REPORT_RECEIVER_URL>/report` after every test run, including failing runs. GitHub Actions will not deliver to `localhost` on a hosted runner, so the tunnel and receiver are required for local demonstration.
+Keep `npm run tunnel` running during every demonstration push. The workflow sends `test-report.json` with `POST https://YOUR-NGROK-DOMAIN/report`; the receiver validates the JSON and atomically replaces the local `test-report.json`. A separate `npm run receiver` command can be used when only localhost delivery is needed.
+
+The receiver is available at `http://localhost:8787/report`, and `http://localhost:8787/health` confirms that it is running. GitHub-hosted runners require the Ngrok URL because their `localhost` is not your computer.
 
 ## GitHub setup
 
@@ -54,7 +56,7 @@ Every push runs `.github/workflows/ci.yml`. The test stage executes the tests an
 
 ## Demonstration sequence
 
-1. Start `npm run receiver` and the tunnel, and configure `REPORT_RECEIVER_URL`.
+1. Start `npm run tunnel`, copy the HTTPS forwarding URL, and configure `REPORT_RECEIVER_URL`.
 2. Push a passing revision and show the green test stage and local `test-report.json`.
 3. Introduce a defect (for example, change a validation test or portal rule), push, and show the red test stage plus the automatically replaced failing JSON report.
 4. Revert/fix the defect and push again. Show the passing JSON report and, on `main`, the deployed static Pages frontend.

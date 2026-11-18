@@ -30,19 +30,28 @@ jobs:
         continue-on-error: true
         run: npm test
 
-      - name: Send report to local receiver
+      - name: Send report to local receiver through Ngrok
         if: always()
         env:
           REPORT_RECEIVER_URL: ${{ secrets.REPORT_RECEIVER_URL }}
         run: |
-          if [ -n "$REPORT_RECEIVER_URL" ]; then
-            curl --fail --retry 3 --retry-delay 2 \
-              -H "Content-Type: application/json" \
-              --data-binary @test-report.json \
-              "$REPORT_RECEIVER_URL/report"
-          else
-            echo "REPORT_RECEIVER_URL is not configured; local receiver was not contacted."
+          if [ -z "$REPORT_RECEIVER_URL" ]; then
+            echo "ERROR: Add the Ngrok HTTPS URL as the REPORT_RECEIVER_URL secret."
+            exit 1
           fi
+          RECEIVER_URL="${REPORT_RECEIVER_URL%/}/report"
+          curl --fail --retry 5 --retry-delay 2 --retry-all-errors \
+            -H "Content-Type: application/json" \
+            --data-binary @test-report.json \
+            "$RECEIVER_URL"
+
+      - name: Save generated report as workflow evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-${{ github.run_id }}
+          path: test-report.json
+          if-no-files-found: error
 
       - name: Fail the test stage when tests fail
         if: steps.tests.outcome != 'success'
