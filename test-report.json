@@ -1,9 +1,9 @@
 {
-  "repositoryName": "Devops Labmid",
-  "branch": "local",
-  "commitSha": "local",
-  "pipelineRunIdentifier": "local-run",
-  "executionTimestamp": "2026-11-18T07:57:44.173Z",
+  "repositoryName": "anfalsiddiqui45/assignment-submission-portal",
+  "branch": "main",
+  "commitSha": "a2dc4efc6e9dfad47484d448525a9fc349943776",
+  "pipelineRunIdentifier": "44262962552",
+  "executionTimestamp": "2026-11-18T07:57:59.353Z",
   "tests": [
     {
       "name": "Complete details and a valid submission URL",
