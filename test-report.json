@@ -3,7 +3,7 @@
   "branch": "local",
   "commitSha": "local",
   "pipelineRunIdentifier": "local-run",
-  "executionTimestamp": "2026-11-18T07:53:58.828Z",
+  "executionTimestamp": "2026-11-18T07:55:35.904Z",
   "tests": [
     {
       "name": "Complete details and a valid submission URL",
@@ -17,12 +17,12 @@
     },
     {
       "name": "Invalid submission URL",
-      "result": "passed",
-      "failureMessage": null
+      "result": "failed",
+      "failureMessage": "Submission with invalid URL was accepted"
     }
   ],
   "total": 3,
-  "passed": 3,
-  "failed": 0,
-  "overallStatus": "passed"
+  "passed": 2,
+  "failed": 1,
+  "overallStatus": "failed"
 }

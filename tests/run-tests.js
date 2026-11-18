@@ -34,7 +34,7 @@ test("Missing registration number", () => {
 
 test("Invalid submission URL", () => {
   saved = [];
-  const result = save({ name: "Ali Khan", registrationNumber: "FA24-001", assignmentTitle: "HTML Assignment", submissionUrl: "not-a-url" });
+  const result = save({ name: "Ali Khan", registrationNumber: "FA24-001", assignmentTitle: "HTML Assignment", submissionUrl: "ftp://example.com/file" });
   if (result.valid) throw new Error("Submission with invalid URL was accepted");
   if (!result.errors.submissionUrl) throw new Error("URL validation message was absent");
   if (saved.length !== 0) throw new Error("Invalid submission was saved");
