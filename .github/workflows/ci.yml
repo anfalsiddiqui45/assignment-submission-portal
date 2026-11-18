@@ -57,8 +57,22 @@ jobs:
         if: always()
         run: npm run email-summary
 
+      - name: Check email configuration
+        if: always()
+        id: email-config
+        env:
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          if [ -n "$EMAIL_ADDRESS" ] && [ -n "$SMTP_PASSWORD" ]; then
+            echo "send_email=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "send_email=false" >> "$GITHUB_OUTPUT"
+            echo "SMTP_PASSWORD or EMAIL_ADDRESS is missing; email delivery is skipped."
+          fi
+
       - name: Email test report
-        if: ${{ always() && secrets.EMAIL_ADDRESS != '' && secrets.SMTP_HOST != '' && secrets.SMTP_PORT != '' && secrets.SMTP_USERNAME != '' && secrets.SMTP_PASSWORD != '' }}
+        if: always() && steps.email-config.outputs.send_email == 'true'
         uses: dawidd6/action-send-mail@v6
         with:
           server_address: ${{ secrets.SMTP_HOST }}
@@ -68,7 +82,7 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "${{ github.repository }} test ${{ job.status }} — commit ${{ github.sha }}"
           to: ${{ secrets.EMAIL_ADDRESS }}
-          from: ${{ secrets.EMAIL_FROM || secrets.SMTP_USERNAME }}
+          from: ${{ secrets.SMTP_USERNAME }}
           body: file://email-summary.txt
           attachments: test-report.json,email-summary.txt
 
